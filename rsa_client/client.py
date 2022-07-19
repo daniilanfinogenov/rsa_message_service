@@ -69,7 +69,11 @@ def listen():
 
     while True:
         data = sock.recv(1024)
-        print('\rpeer: {}\n> '.format(data.decode()), end='')
+        try:
+            decmsg = main.decrypt(data, privkey)
+        except: print("couldn't decode text message")
+        
+        print('\rpeer: {}\n> '.format(decmsg.decode()), end='')
 
 listener = threading.Thread(target=listen, daemon=True)
 listener.start()
@@ -80,7 +84,11 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', dport))
 while True:
     msg = input('> ')
-    sock.sendto(msg.encode(), (ip, sport))
+    encmsg = main.encrypt(msg ,pubkey)
+    with open('message.bin', 'wb') as bmessage:
+        
+        bmessage.write(encmsg)
+        sock.sendto(encmsg, (ip, sport))
     
 while True:
     command = input("Enter your action: ")
