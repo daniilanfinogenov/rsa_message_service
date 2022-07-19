@@ -67,17 +67,20 @@ def listen():
         data = sock.recv(1024)
         print('\rpeer: {}\n> '.format(data.decode()), end='')
 
-listener = threading.Thread(target=listen, daemon=True);
+listener = threading.Thread(target=listen, daemon=True)
 listener.start()
 
 # send messages
 # equiv: echo 'xxx' | nc -u -p 50002 x.x.x.x 50001
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', dport))
-
+while True:
+    msg = input('> ')
+    sock.sendto(msg.encode(), (ip, sport))
+    
 while True:
     command = input("Enter your action: ")
-
+    
     match command:
         case 'help':
             print("Command list: \nhelp- return all the commands \nexit - close the app \nencode - encode the text you have been written \ndecode - decode the bin you enter")
@@ -85,12 +88,12 @@ while True:
             print("Good bye")
             break
         case 'encode':
-            message = input("Enter message: ")
-            encmsg = main.encrypt(message ,pubkey)
+            encmsg = input("Enter message: ")
+            #encmsg = main.encrypt(message ,pubkey)
             print(type(encmsg))
             with open('message.bin', 'wb') as bmessage:
-                bmessage.write(encmsg)
-            sock.sendto(encmsg.encode(), (ip, sport))
+                bmessage.write(encmsg.encode())
+                sock.sendto(encmsg.encode(), (ip, sport))
         case 'decode':
             file = input("Type place ...")
             with open(file, "rb") as file:
