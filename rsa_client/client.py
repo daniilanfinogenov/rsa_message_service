@@ -17,33 +17,11 @@ except:
 
 #------------------------------------Main Part------------------------------------------#
 
-# while True:
-
-#     command = input("Enter your action: ")
-
-#     match command:
-#         case 'help':
-#             print("Command list: \nhelp- return all the commands \nexit - close the app \nencode - encode the text you have been written \ndecode - decode the bin you enter")
-#         case 'exit':
-#             print("Good bye")
-#             break
-#         case 'encode':
-#             message = input("Enter message: ")
-#             encmsg = main.encrypt(message ,pubkey)
-#             print(type(encmsg))
-#             with open('message.bin', 'wb') as bmessage:
-#                 bmessage.write(encmsg)
-#             print(str(encmsg))
-#         case 'decode':
-#             file = input("Type place ...")
-#             with open(file, "rb") as file:
-#                 file = file.read()
-#                 decmsg = main.decrypt(file, privkey)
-#                 print(decmsg)
 
 
 
-rendezvous = ('192.168.31.199/24', 55555)
+
+rendezvous = ('192.168.31.199', 55555)
 
 # connect to rendezvous
 print('connecting to rendezvous server')
@@ -98,5 +76,26 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', dport))
 
 while True:
-    msg = input('> ')
-    sock.sendto(msg.encode(), (ip, sport))
+    command = input("Enter your action: ")
+
+    match command:
+        case 'help':
+            print("Command list: \nhelp- return all the commands \nexit - close the app \nencode - encode the text you have been written \ndecode - decode the bin you enter")
+        case 'exit':
+            print("Good bye")
+            break
+        case 'encode':
+            message = input("Enter message: ")
+            encmsg = main.encrypt(message ,pubkey)
+            print(type(encmsg))
+            with open('message.bin', 'wb') as bmessage:
+                bmessage.write(encmsg)
+            sock.sendto(encmsg.encode(), (ip, sport))
+        case 'decode':
+            file = input("Type place ...")
+            with open(file, "rb") as file:
+                file = file.read()
+                decmsg = main.decrypt(file, privkey)
+                print(decmsg)
+    
+    
