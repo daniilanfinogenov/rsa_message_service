@@ -55,6 +55,9 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', sport))
 sock.sendto(b'0', (ip, dport))
 
+sock.sendto(pubkey, (ip, sport))
+pubkey = sock.recv(1024)
+
 print('ready to exchange messages\n')
 
 #closing the socket ,cause if I wouldn't it is gonna happen an error like: OSError: [Errno 98] Address already in use
@@ -69,10 +72,11 @@ def listen():
 
     while True:
         data = sock.recv(1024)
+        
         try:
             decmsg = main.decrypt(data, privkey)
         except: print("couldn't decode text message")
-        
+
         print('\rpeer: {}\n> '.format(decmsg.decode()), end='')
 
 listener = threading.Thread(target=listen, daemon=True)
@@ -82,6 +86,9 @@ listener.start()
 # equiv: echo 'xxx' | nc -u -p 50002 x.x.x.x 50001
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', dport))
+
+
+
 while True:
     msg = input('> ')
     encmsg = main.encrypt(msg ,pubkey)
