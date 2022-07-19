@@ -21,7 +21,7 @@ except:
 
 
 
-rendezvous = ('192.168.31.199', 55555)
+rendezvous = ('192.168.31.77', 55555)
 
 # connect to rendezvous
 print('connecting to rendezvous server')
@@ -57,8 +57,12 @@ sock.sendto(b'0', (ip, dport))
 
 print('ready to exchange messages\n')
 
+#closing the socket ,cause if I wouldn't it is gonna happen an error like: OSError: [Errno 98] Address already in use
+sock.close()
+
 # listen for
 # equiv: nc -u -l 50001
+
 def listen():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('0.0.0.0', sport))
