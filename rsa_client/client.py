@@ -28,10 +28,10 @@ print('connecting to rendezvous server')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', 50001))
-sock.sendto(pubkey, rendezvous)
+sock.sendto(b'0', rendezvous)
 
-# #conn is your socket
-# sock.send(pubkey.publickey().exportKey(format='PEM', passphrase=None, pkcs=1)) 
+#conn is your socket
+sock.sendto(pubkey.save_pkcs1(format="PEM"),rendezvous) 
 
 while True:
     data = sock.recv(1024).decode()
@@ -77,7 +77,9 @@ def listen():
         
         try:
             decmsg = main.decrypt(data, privkey)
-        except: print("couldn't decode text message")
+        except: 
+            print("couldn't decode text message")
+            break
 
         print('\rpeer: {}\n> '.format(decmsg.decode()), end='')
 
@@ -93,7 +95,7 @@ sock.bind(('0.0.0.0', dport))
 
 while True:
     msg = input('> ')
-    encmsg = main.encrypt(msg ,pubkey)
+    encmsg = main.encrypt(msg ,pubkey.load_pkcs1)
     with open('message.bin', 'wb') as bmessage:
         
         bmessage.write(encmsg)
