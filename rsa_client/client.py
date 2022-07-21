@@ -33,6 +33,7 @@ sock.sendto(b'0', rendezvous)
 #conn is your socket
 sock.sendto(pubkey.save_pkcs1(format="PEM"),rendezvous) 
 
+
 while True:
     data = sock.recv(1024).decode()
 
@@ -41,9 +42,10 @@ while True:
         break
 
 data = sock.recv(1024).decode()
-ip, sport, dport = data.split(' ')
+ip, sport, dport, pubkey = data.split(' ')
 sport = int(sport)
 dport = int(dport)
+pubkey = pubkey.load_pkcs1(format="PEM")
 
 print('\ngot peer')
 print('  ip:          {}'.format(ip))
@@ -95,7 +97,7 @@ sock.bind(('0.0.0.0', dport))
 
 while True:
     msg = input('> ')
-    encmsg = main.encrypt(msg ,pubkey.load_pkcs1)
+    encmsg = main.encrypt(msg ,pubkey)
     with open('message.bin', 'wb') as bmessage:
         
         bmessage.write(encmsg)
