@@ -1,3 +1,4 @@
+import rsa
 import main
 import os
 import socket
@@ -17,12 +18,15 @@ sock.bind(('0.0.0.0', 55555))
 
 while True:
     clients = []
+    pubkeys = []
 
     while True:
-        data, address = sock.recvfrom(128)
+        data, address = sock.recvfrom(1024)
+        # pub_key = rsa.importKey(sock.recv( 1024 ), passphrase=None)
 
         print('connection from: {}'.format(address))
         clients.append(address)
+        pubkeys.append(data)
 
         sock.sendto(b'ready', address)
 
@@ -32,8 +36,12 @@ while True:
 
     c1 = clients.pop()
     c1_addr, c1_port = c1
+    c1_pubkey = pubkeys.pop()
     c2 = clients.pop()
     c2_addr, c2_port = c2
+    c2_pubkey = pubkeys.pop()
 
-    sock.sendto('{} {} {}'.format(c1_addr, c1_port, known_port).encode(), c2)
-    sock.sendto('{} {} {}'.format(c2_addr, c2_port, known_port).encode(), c1)
+
+    sock.sendto('{} {} {}'.format(c1_addr, c1_port, known_port, c1_pubkey).encode(), c2)
+    sock.sendto('{} {} {}'.format(c2_addr, c2_port, known_port, c2_pubkey).encode(), c1)
+    
