@@ -22,7 +22,7 @@ while True:
 
     while True:
         data, address = sock.recvfrom(1024)
-        pub_key = rsa.importKey(sock.recv( 1024 ), passphrase=None)
+        pub_key = sock.recv(1024)
 
         print('connection from: {}'.format(address))
         clients.append(address)
