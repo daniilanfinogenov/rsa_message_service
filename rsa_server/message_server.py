@@ -42,6 +42,8 @@ while True:
     c2_pubkey = pubkeys.pop()
 
 
-    sock.sendto('{} | {} | {} | {}'.format(c1_addr, c1_port, known_port, c1_pubkey).encode(), c2)
-    sock.sendto('{} | {} | {} | {}'.format(c2_addr, c2_port, known_port, c2_pubkey).encode(), c1)
+    sock.sendto('{} | {} | {}'.format(c1_addr, c1_port, known_port).encode(), c2)
+    sock.sendto('{} | {} | {}'.format(c2_addr, c2_port, known_port).encode(), c1)
+    sock.sendto(c1_pubkey.encode(), c2)
+    sock.sendto(c2_pubkey.encode(), c1)
     

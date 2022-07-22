@@ -44,9 +44,10 @@ while True:
 # Разберись с моментом получения публичных ключей
 data = sock.recv(1024).decode()
 print(data)
-ip, sport, dport, pubkey = data.split(' | ')
+ip, sport, dport = data.split(' | ')
 sport = int(sport)
 dport = int(dport)
+pubkey = sock.recv(1024).decode()
 pubkey = pubkey.load_pkcs1(format="PEM")
 
 print('\ngot peer')
