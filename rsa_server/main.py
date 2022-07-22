@@ -2,30 +2,11 @@ import rsa
 import os
 
 
-def generate_keys():
-    (pubKey, privKey) = rsa.newkeys(2048)
-    with open('../keys/pubkey.pem', 'wb') as f:
-        f.write(pubKey.save_pkcs1('PEM'))
-    
-    with open('../keys/privkey.pem', 'wb') as f:
-        f.write(privKey.save_pkcs1('PEM'))
-
-def generate_openssl_keys():
-    os.system("openssl genrsa -out keys/privatekey.pem 4096")
+def generate_openssl_keys(length=4096):
+    if os.path.exists("keys/"): pass
+    else: os.system("mkdir keys")
+    os.system(f"openssl genrsa -out keys/privatekey.pem {length}")
     os.system("pyrsa-priv2pub -i keys/privatekey.pem -o keys/publickey.pem")
-
-def generate_key_by_RSA():
-    random_generator = Random.new().read
-
-    key = RSA.generate(4096, random_generator)
-    public_key = key.publickey()
-    with open('../keys/pubkey.pem', 'wb') as f:
-        f.write(public_key.save_pkcs1('PEM'))
-    
-    with open('../rsa_client/keys/privkey.pem', 'wb') as f:
-        f.write(key.save_pkcs1('PEM'))
-
-    return key, public_key
 
 def load_keys():
     with open('keys/publickey.pem', 'rb') as f:

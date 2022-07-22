@@ -41,8 +41,10 @@ while True:
         print('checked in with server, waiting')
         break
 
+# Разберись с моментом получения публичных ключей
 data = sock.recv(1024).decode()
-ip, sport, dport, pubkey = data.split(' ')
+print(data)
+ip, sport, dport, pubkey = data.split(' | ')
 sport = int(sport)
 dport = int(dport)
 pubkey = pubkey.load_pkcs1(format="PEM")
@@ -50,7 +52,8 @@ pubkey = pubkey.load_pkcs1(format="PEM")
 print('\ngot peer')
 print('  ip:          {}'.format(ip))
 print('  source port: {}'.format(sport))
-print('  dest port:   {}\n'.format(dport))
+print('  dest port:   {}'.format(dport))
+print('  public key was found   \n')
 
 
 
