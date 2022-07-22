@@ -1,6 +1,7 @@
 import sys
 import socket
 import sys
+import rsa
 import threading
 sys.path.insert(1, '../rsa_server/') #Select another path on device (~/rsa_service)
 import main
@@ -47,8 +48,9 @@ print(data)
 ip, sport, dport = data.split(' | ')
 sport = int(sport)
 dport = int(dport)
-pubkey = sock.recv(1024).decode()
-pubkey = pubkey.load_pkcs1(format="PEM")
+pubkey = sock.recv(1024)
+print(pubkey)
+pubkey = rsa.PublicKey.load_pkcs1(pubkey)
 
 print('\ngot peer')
 print('  ip:          {}'.format(ip))
