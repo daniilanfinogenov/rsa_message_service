@@ -49,7 +49,6 @@ ip, sport, dport = data.split(' | ')
 sport = int(sport)
 dport = int(dport)
 pubkey = sock.recv(1024)
-print(pubkey)
 pubkey = rsa.PublicKey.load_pkcs1(pubkey)
 
 print('\ngot peer')
@@ -89,7 +88,7 @@ def listen():
             print("couldn't decode text message")
             break
 
-        print('\rpeer: {}\n> '.format(decmsg.decode()), end='')
+        print('\rpeer: {}\n> '.format(decmsg), end='')
 
 listener = threading.Thread(target=listen, daemon=True)
 listener.start()
