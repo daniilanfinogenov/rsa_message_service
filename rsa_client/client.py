@@ -16,6 +16,9 @@ except:
     main.generate_openssl_keys() #Faster then generate_keys() ,cause using openssl lib
 
 
+#-------------------------------Not global functions------------------------------------#
+
+
 #------------------------------------Main Part------------------------------------------#
 
 
@@ -32,7 +35,7 @@ sock.bind(('0.0.0.0', 50001))
 sock.sendto(b'0', rendezvous)
 
 #conn is your socket
-sock.sendto(pubkey.save_pkcs1(format="PEM"),rendezvous) 
+sock.sendto(rsa.PublicKey.save_pkcs1(pubkey, format="PEM"),rendezvous) 
 
 
 while True:
@@ -42,14 +45,25 @@ while True:
         print('checked in with server, waiting')
         break
 
-# Разберись с моментом получения публичных ключей
+
 data = sock.recv(1024).decode()
+
+#Find out why it doesn't get an public key ,but get's b'0'
+
 print(data)
 ip, sport, dport = data.split(' | ')
 sport = int(sport)
-dport = int(dport)
+dport = int(dport) 
+
 pubkey = sock.recv(1024)
+
+
+print(pubkey)
 pubkey = rsa.PublicKey.load_pkcs1(pubkey)
+
+
+
+
 
 print('\ngot peer')
 print('  ip:          {}'.format(ip))
@@ -84,11 +98,11 @@ def listen():
         
         try:
             decmsg = main.decrypt(data, privkey)
+            print('\rpeer: {}\n> '.format(decmsg), end='')
         except: 
             print("couldn't decode text message")
-            break
 
-        print('\rpeer: {}\n> '.format(decmsg), end='')
+        
 
 listener = threading.Thread(target=listen, daemon=True)
 listener.start()
@@ -98,37 +112,17 @@ listener.start()
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', dport))
 
+active_threads_of_service = threading.active_count()
 
+print(f'number of active threads: {active_threads_of_service}')
 
 while True:
+
     msg = input('> ')
     encmsg = main.encrypt(msg ,pubkey)
-    with open('message.bin', 'wb') as bmessage:
-        
-        bmessage.write(encmsg)
-        sock.sendto(encmsg, (ip, sport))
-    
-while True:
-    command = input("Enter your action: ")
-    
-    match command:
-        case 'help':
-            print("Command list: \nhelp- return all the commands \nexit - close the app \nencode - encode the text you have been written \ndecode - decode the bin you enter")
-        case 'exit':
-            print("Good bye")
-            break
-        case 'encode':
-            encmsg = input("Enter message: ")
-            #encmsg = main.encrypt(message ,pubkey)
-            print(type(encmsg))
-            with open('message.bin', 'wb') as bmessage:
-                bmessage.write(encmsg.encode())
-                sock.sendto(encmsg.encode(), (ip, sport))
-        case 'decode':
-            file = input("Type place ...")
-            with open(file, "rb") as file:
-                file = file.read()
-                decmsg = main.decrypt(file, privkey)
-                print(decmsg)
-    
-    
+
+    if threading.active_count() < active_threads_of_service:
+        listener = threading.Thread(target=listen, daemon=True)
+        listener.start()
+
+    sock.sendto(encmsg, (ip, sport))

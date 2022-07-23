@@ -5,8 +5,7 @@ import socket
 
 #-------------------------------------Not global functions-------------------------------------#
 
-def add_user(name, password):
-    pass
+
 
 #-------------------------------------Main block-----------------------------------------------#
 
@@ -22,7 +21,7 @@ while True:
 
     while True:
         data, address = sock.recvfrom(1024)
-        pub_key = sock.recv(1024)
+        pub_key = sock.recvfrom(1024)
 
         print('connection from: {}'.format(address))
         clients.append(address)
