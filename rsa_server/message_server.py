@@ -21,7 +21,7 @@ while True:
 
     while True:
         data, address = sock.recvfrom(1024)
-        pub_key = sock.recvfrom(1024)
+        pub_key, address = sock.recvfrom(1024)
 
         print('connection from: {}'.format(address))
         clients.append(address)

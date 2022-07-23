@@ -118,11 +118,11 @@ print(f'number of active threads: {active_threads_of_service}')
 
 while True:
 
-    msg = input('> ')
-    encmsg = main.encrypt(msg ,pubkey)
-
     if threading.active_count() < active_threads_of_service:
         listener = threading.Thread(target=listen, daemon=True)
         listener.start()
+
+    msg = input('> ')
+    encmsg = main.encrypt(msg ,pubkey)
 
     sock.sendto(encmsg, (ip, sport))
