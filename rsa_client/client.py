@@ -34,10 +34,6 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', 50001))
 sock.sendto(b'0', rendezvous)
 
-#conn is your socket
-sock.sendto(rsa.PublicKey.save_pkcs1(pubkey, format="PEM"),rendezvous) 
-
-
 while True:
     data = sock.recv(1024).decode()
 
@@ -55,31 +51,37 @@ ip, sport, dport = data.split(' | ')
 sport = int(sport)
 dport = int(dport) 
 
-pubkey = sock.recv(1024)
-
-
-print(pubkey)
-pubkey = rsa.PublicKey.load_pkcs1(pubkey)
-
-
-
-
 
 print('\ngot peer')
 print('  ip:          {}'.format(ip))
 print('  source port: {}'.format(sport))
 print('  dest port:   {}'.format(dport))
-print('  public key was found   \n')
+
 
 
 
 # punch hole
 # equiv: echo 'punch hole' | nc -u -p 50001 x.x.x.x 50002
-print('punching hole')
+print('\npunching hole    \n')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', sport))
 sock.sendto(b'0', (ip, dport))
+
+#conn is your socket
+sock.sendto(rsa.PublicKey.save_pkcs1(pubkey, format="PEM"),(ip, sport)) 
+
+
+while True:
+    pubkey = sock.recv(1024)
+
+    try: 
+        pubkey = rsa.PublicKey.load_pkcs1(pubkey)
+        break
+    except:
+        pass
+
+print('public key was found   \n')
 
 print('ready to exchange messages\n')
 

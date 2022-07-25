@@ -17,15 +17,14 @@ sock.bind(('0.0.0.0', 55555))
 
 while True:
     clients = []
-    pubkeys = []
 
     while True:
         data, address = sock.recvfrom(1024)
-        pub_key, address = sock.recvfrom(1024)
+        
 
         print('connection from: {}'.format(address))
         clients.append(address)
-        pubkeys.append(pub_key)
+        
 
         sock.sendto(b'ready', address)
 
@@ -35,14 +34,10 @@ while True:
 
     c1 = clients.pop()
     c1_addr, c1_port = c1
-    c1_pubkey = pubkeys.pop()
+    
     c2 = clients.pop()
     c2_addr, c2_port = c2
-    c2_pubkey = pubkeys.pop()
 
 
     sock.sendto('{} | {} | {}'.format(c1_addr, c1_port, known_port).encode(), c2)
     sock.sendto('{} | {} | {}'.format(c2_addr, c2_port, known_port).encode(), c1)
-    sock.sendto(c1_pubkey, c2)
-    sock.sendto(c2_pubkey, c1)
-    
