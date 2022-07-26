@@ -3,6 +3,17 @@ import main
 import os
 import socket
 
+
+#--------------------------------------Global variables----------------------------------------#
+
+
+HEADER = 64
+PORT = 55555
+SERVER = socket.gethostbyname(socket.gethostname())
+ADDR = (SERVER, PORT)
+DISCONNECT_MESSAGE = "!DISCONNECT"
+
+
 #-------------------------------------Not global functions-------------------------------------#
 
 
@@ -13,7 +24,7 @@ import socket
 known_port = 50002
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', 55555))
+sock.bind(ADDR)
 
 while True:
     clients = []

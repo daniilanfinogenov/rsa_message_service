@@ -7,6 +7,17 @@ sys.path.insert(1, '../rsa_server/') #Select another path on device (~/rsa_servi
 import main
 
 
+#----------------------------------Global variables--------------------------------------#
+
+
+HEADER = 64
+PORT = 55555
+FORMAT = 'utf-8'
+KEY_FORMAT = "PEM"
+DISCONNECT_MESSAGE = "!DISCONNECT"
+SERVER = "192.168.31.77"
+
+
 #--------------You should install openssl for generate_openssl_keys function-------------#
 
 
@@ -19,13 +30,10 @@ except:
 #-------------------------------Not global functions------------------------------------#
 
 
+
 #------------------------------------Main Part------------------------------------------#
 
-
-
-
-
-rendezvous = ('192.168.31.77', 55555)
+rendezvous = (SERVER, PORT)
 
 # connect to rendezvous
 print('connecting to rendezvous server')
@@ -35,14 +43,14 @@ sock.bind(('0.0.0.0', 50001))
 sock.sendto(b'0', rendezvous)
 
 while True:
-    data = sock.recv(1024).decode()
+    data = sock.recv(1024).decode(FORMAT)
 
     if data.strip() == 'ready':
         print('checked in with server, waiting')
         break
 
 
-data = sock.recv(1024).decode()
+data = sock.recv(1024).decode(FORMAT)
 
 #Find out why it doesn't get an public key ,but get's b'0'
 
@@ -69,14 +77,14 @@ sock.bind(('0.0.0.0', sport))
 sock.sendto(b'0', (ip, dport))
 
 #conn is your socket
-sock.sendto(rsa.PublicKey.save_pkcs1(pubkey, format="PEM"),(ip, sport)) 
+sock.sendto(rsa.PublicKey.save_pkcs1(pubkey, format=KEY_FORMAT), (ip, sport)) 
 
 
 while True:
     pubkey = sock.recv(1024)
 
     try: 
-        pubkey = rsa.PublicKey.load_pkcs1(pubkey)
+        pubkey = rsa.PublicKey.load_pkcs1(pubkey, format=KEY_FORMAT)
         break
     except:
         pass
