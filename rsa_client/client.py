@@ -41,6 +41,8 @@ print('connecting to rendezvous server')
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', 50001))
 sock.sendto(b'0', rendezvous)
+sock.sendto(rsa.PublicKey.save_pkcs1(pubkey, format=KEY_FORMAT), rendezvous) 
+
 
 while True:
     data = sock.recv(1024).decode(FORMAT)
@@ -51,8 +53,6 @@ while True:
 
 
 data = sock.recv(1024).decode(FORMAT)
-
-#Find out why it doesn't get an public key ,but get's b'0'
 
 print(data)
 ip, sport, dport = data.split(' | ')
@@ -67,6 +67,16 @@ print('  dest port:   {}'.format(dport))
 
 
 
+while True:
+    pubkey = sock.recv(1024)
+
+    try: 
+        pubkey = rsa.PublicKey.load_pkcs1(pubkey, format=KEY_FORMAT)
+        print('public key was found   \n')
+
+        break
+    except:
+        pass
 
 # punch hole
 # equiv: echo 'punch hole' | nc -u -p 50001 x.x.x.x 50002
@@ -76,20 +86,6 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', sport))
 sock.sendto(b'0', (ip, dport))
 
-#conn is your socket
-sock.sendto(rsa.PublicKey.save_pkcs1(pubkey, format=KEY_FORMAT), (ip, sport)) 
-
-
-while True:
-    pubkey = sock.recv(1024)
-
-    try: 
-        pubkey = rsa.PublicKey.load_pkcs1(pubkey, format=KEY_FORMAT)
-        break
-    except:
-        pass
-
-print('public key was found   \n')
 
 print('ready to exchange messages\n')
 
