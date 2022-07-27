@@ -1,3 +1,4 @@
+from email import message
 import sys
 import socket
 import sys
@@ -15,7 +16,7 @@ PORT = 55555
 FORMAT = 'utf-8'
 KEY_FORMAT = "PEM"
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "192.168.31.77"
+SERVER = "192.168.31.173"
 
 
 #--------------You should install openssl for generate_openssl_keys function-------------#
@@ -28,6 +29,27 @@ except:
 
 
 #-------------------------------Not global functions------------------------------------#
+
+def isOnline(sock, ip, sport):
+    
+    sock.sendto(b'1', (ip, sport))
+    data = sock.recv(1024)
+
+    if data == b'1':
+        return True
+    
+    return False
+
+def saveMessage(msg):
+    with open("message.txt", "a") as f:
+        f.write(msg + "\n")
+
+def send_savedMessages(sock, ip, sport, pubkey):
+    with open("message.txt", 'r') as f:
+        if f:
+            for msg in f.readlines():
+                encmsg = main.encrypt(msg ,pubkey)
+                sock.sendto(encmsg, (ip, sport))
 
 
 
@@ -101,12 +123,15 @@ def listen():
 
     while True:
         data = sock.recv(1024)
-        
-        try:
-            decmsg = main.decrypt(data, privkey)
-            print('\rpeer: {}\n> '.format(decmsg), end='')
-        except: 
-            print("couldn't decode text message")
+
+        if data == b'1':
+            sock.sendto(b'1', (ip, dport))
+        else:
+            try:
+                decmsg = main.decrypt(data, privkey)
+                print('\rpeer: {}\n> '.format(decmsg), end='')
+            except: 
+                print("couldn't decode text message")
 
         
 
@@ -131,4 +156,9 @@ while True:
     msg = input('> ')
     encmsg = main.encrypt(msg ,pubkey)
 
-    sock.sendto(encmsg, (ip, sport))
+    if isOnline(sock, ip, sport):
+        send_savedMessages(sock, ip, sport, pubkey)
+        sock.sendto(encmsg, (ip, sport))
+    else: 
+        saveMessage(msg)
+
